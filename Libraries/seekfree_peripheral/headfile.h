@@ -59,7 +59,6 @@
 #include "SEEKFREE_SOFT_I2C.h"
 #include "SEEKFREE_LCD4002_I2C.h"
 #include "SEEKFREE_INA226.h"
-<<<<<<< HEAD
 
 extern volatile int mymode;
 extern volatile int mydistance;
@@ -69,7 +68,3 @@ extern volatile unsigned char length;    // 长度值
 extern volatile bit new_data_ready;      // 新数据就绪标志
 
 #endif
-=======
-#include "SEEKFREE_INA219.h"
-#endif
->>>>>>> e8ccb705947b5be5317e2c57cf91205385a33f1e
