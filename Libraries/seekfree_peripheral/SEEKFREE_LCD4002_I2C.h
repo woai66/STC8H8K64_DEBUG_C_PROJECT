@@ -47,7 +47,7 @@
 #define LCD4002_RS          0x01    // P0
 #define LCD4002_RW          0x02    // P1  
 #define LCD4002_E           0x04    // P2
-#define LCD4002_BL          0x08    // P3 (背光)
+#define LCD4002_BL          0x00    // P3 (背光默认0x08开)
 #define LCD4002_D4          0x10    // P4
 #define LCD4002_D5          0x20    // P5
 #define LCD4002_D6          0x40    // P6

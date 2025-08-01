@@ -24,7 +24,7 @@
 #include "common.h"
 
 
-#define FOSC					44236800			// FOSC的值设置为0，则内核频率通过寄存器强制设置为44.2368Mhz,，
+#define FOSC					11059200			// FOSC的值设置为0，则内核频率通过寄存器强制设置为44.2368Mhz,，
 											// 不管STC-ISP软件下载时候选择多少，他都是44.2368Mhz。
 											
 //#define FOSC          		44236800	// FOSC的值设置为44.2368Mhz,

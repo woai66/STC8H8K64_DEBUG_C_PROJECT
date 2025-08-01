@@ -18,11 +18,66 @@
  ********************************************************************************************************************/
 #include "headfile.h"
 
+
+volatile bit new_data_ready = 0;
+
+enum {
+    STATE_WAIT_HEADER1,   // ?????1 (0x00)
+    STATE_WAIT_HEADER2,   // ?????2 (0xFF)
+    STATE_READ_DISTANCE,  // ????
+    STATE_READ_LENGTH,    // ????
+    STATE_WAIT_FOOTER     // ????? (0xFE)
+} protocol_state = STATE_WAIT_HEADER1;
+
+void ParseUART_Protocol(unsigned char rx_data) {
+    static unsigned char temp_distance, temp_length;
+    
+    switch(protocol_state) {
+        case STATE_WAIT_HEADER1:
+            if(rx_data == 0x00) {
+                protocol_state = STATE_WAIT_HEADER2;
+            }
+            break;
+            
+        case STATE_WAIT_HEADER2:
+            if(rx_data == 0xFF) {
+                protocol_state = STATE_READ_DISTANCE;
+            } else {
+                protocol_state = STATE_WAIT_HEADER1; // ????,????
+            }
+            break;
+            
+        case STATE_READ_DISTANCE:
+            temp_distance = rx_data;
+            protocol_state = STATE_READ_LENGTH;
+            break;
+            
+        case STATE_READ_LENGTH:
+            temp_length = rx_data;
+            protocol_state = STATE_WAIT_FOOTER;
+            break;
+            
+        case STATE_WAIT_FOOTER:
+            if(rx_data == 0xFE) {
+                // ???????
+                mydistance = temp_distance;
+                mysquarelength = temp_length;
+						    mymode=0;
+                new_data_ready = 1;  // ????????
+            }
+            protocol_state = STATE_WAIT_HEADER1; // ???????????
+            break;
+            
+        default:
+            protocol_state = STATE_WAIT_HEADER1;
+    }
+}
 //UART1中断
 void UART1_Isr() interrupt 4
 {
-    uint8 res;
-	static uint8 dwon_count;
+
+	
+	
     if(UART1_GET_TX_FLAG)
     {
         UART1_CLEAR_TX_FLAG;
@@ -30,18 +85,9 @@ void UART1_Isr() interrupt 4
     }
     if(UART1_GET_RX_FLAG)
     {
+			  
         UART1_CLEAR_RX_FLAG;
-        res = SBUF;
-        //程序自动下载
-        if(res == 0x7F)
-        {
-            if(dwon_count++ > 20)
-                IAP_CONTR = 0x60;
-        }
-        else
-        {
-            dwon_count = 0;
-        }
+        ParseUART_Protocol(SBUF); // ????????
     }
 }
 
