@@ -745,6 +745,7 @@
               <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA226.h</FilePath>
             </File>
             <File>
+<<<<<<< HEAD
               <FileName>SEEKFREE_TSL1401.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_TSL1401.c</FilePath>
@@ -753,6 +754,16 @@
               <FileName>SEEKFREE_TSL1401.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_TSL1401.h</FilePath>
+=======
+              <FileName>SEEKFREE_INA219.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA219.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEEKFREE_INA219.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA219.h</FilePath>
+>>>>>>> e8ccb705947b5be5317e2c57cf91205385a33f1e
             </File>
           </Files>
         </Group>

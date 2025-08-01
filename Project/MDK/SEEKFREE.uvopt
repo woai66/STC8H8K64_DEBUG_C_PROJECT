@@ -1074,25 +1074,43 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>75</FileNumber>
+=======
+      <FileNumber>77</FileNumber>
+>>>>>>> e8ccb705947b5be5317e2c57cf91205385a33f1e
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+<<<<<<< HEAD
       <PathWithFileName>..\..\Libraries\seekfree_peripheral\SEEKFREE_TSL1401.c</PathWithFileName>
       <FilenameWithoutPath>SEEKFREE_TSL1401.c</FilenameWithoutPath>
+=======
+      <PathWithFileName>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA219.c</PathWithFileName>
+      <FilenameWithoutPath>SEEKFREE_INA219.c</FilenameWithoutPath>
+>>>>>>> e8ccb705947b5be5317e2c57cf91205385a33f1e
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>76</FileNumber>
+=======
+      <FileNumber>78</FileNumber>
+>>>>>>> e8ccb705947b5be5317e2c57cf91205385a33f1e
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+<<<<<<< HEAD
       <PathWithFileName>..\..\Libraries\seekfree_peripheral\SEEKFREE_TSL1401.h</PathWithFileName>
       <FilenameWithoutPath>SEEKFREE_TSL1401.h</FilenameWithoutPath>
+=======
+      <PathWithFileName>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA219.h</PathWithFileName>
+      <FilenameWithoutPath>SEEKFREE_INA219.h</FilenameWithoutPath>
+>>>>>>> e8ccb705947b5be5317e2c57cf91205385a33f1e
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1106,7 +1124,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>77</FileNumber>
+      <FileNumber>79</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1118,7 +1136,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>78</FileNumber>
+      <FileNumber>80</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1130,7 +1148,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>79</FileNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1150,7 +1168,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
-      <FileNumber>80</FileNumber>
+      <FileNumber>82</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1170,7 +1188,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <FileNumber>83</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1182,7 +1200,7 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>82</FileNumber>
+      <FileNumber>84</FileNumber>
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1202,7 +1220,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <FileNumber>85</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
