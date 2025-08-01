@@ -766,6 +766,16 @@
               <FileType>5</FileType>
               <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA226.h</FilePath>
             </File>
+            <File>
+              <FileName>SEEKFREE_INA219.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA219.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEEKFREE_INA219.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Libraries\seekfree_peripheral\SEEKFREE_INA219.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

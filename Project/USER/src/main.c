@@ -43,35 +43,59 @@
  * 3. 如果需要修改I2C引脚，请修改SEEKFREE_SOFT_I2C.h中的引脚定义
  */
 
+#define USE_INA219
+
 void main()
 {
     char text_buffer[20];
     float current;
+	float vol;
+	float power;
+	float power_get;
     
     board_init(); // 初始化内部寄存器，勿删除此句代码。
 
     // 初始化LCD4002液晶屏
     lcd4002_init();
 
-    // 初始化INA226
+    // 初始化电流传感器
+#if defined(USE_INA226)
     ina226_init();
-
+#elif defined(USE_INA219)
+    ina219_init();
+#endif
     // 延时一下确保初始化完成
     delay_ms(100);
 
     // 显示欢迎信息
+#if defined(USE_INA226)
     lcd4002_write_string_at(0, 0, "INA226 Test");
+#elif defined(USE_INA219)
+    lcd4002_write_string_at(0, 0, "INA219 Test");
+#endif
 
     while (1)
     {
+#if defined(USE_INA226)
         current = ina226_get_current();
+		//电流矫正系数
 		current /=1.11f;
-        
+        vol = ina226_get_bus_voltage();
+		power = current * vol;
+		power_get = ina226_get_power();
+#elif defined(USE_INA219)
+        current = ina219_get_current();
+        vol = ina219_get_bus_voltage();
+        power = current * vol;
+        power_get = ina219_get_power();
+#endif
         // 将电流值格式化为字符串
-        sprintf(text_buffer, "Current: %.3fA", current);
-        
-        // 在LCD第二行显示电流值
-        lcd4002_write_string_at(0, 1, text_buffer);
+        sprintf(text_buffer, "I: %.3fA, V: %.3fV, P: %.3fW", current, vol, power);
+        lcd4002_write_string_at(0, 0, text_buffer);
+		
+		
+		//sprintf(text_buffer, "P_GET: %.3fW", power_get);
+		//lcd4002_write_string_at(0, 1, text_buffer);
 
         delay_ms(10); // 每500ms刷新一次
     }

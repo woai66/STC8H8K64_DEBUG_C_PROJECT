@@ -59,5 +59,5 @@
 #include "SEEKFREE_SOFT_I2C.h"
 #include "SEEKFREE_LCD4002_I2C.h"
 #include "SEEKFREE_INA226.h"
-
+#include "SEEKFREE_INA219.h"
 #endif
