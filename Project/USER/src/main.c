@@ -1,16 +1,16 @@
 /*********************************************************************************************************************
  * COPYRIGHT NOTICE
- * Copyright (c) 2020,Öğ·É¿Æ¼¼
+ * Copyright (c) 2020,é€é£ç§‘æŠ€
  * All rights reserved.
- * ¼¼ÊõÌÖÂÛQQÈº£ºÒ»Èº£º179029047(ÒÑÂú)  ¶şÈº£º244861897(ÒÑÂú)  ÈıÈº£º824575535
+ * æŠ€æœ¯è®¨è®ºQQç¾¤ï¼šä¸€ç¾¤ï¼š179029047(å·²æ»¡)  äºŒç¾¤ï¼š244861897(å·²æ»¡)  ä¸‰ç¾¤ï¼š824575535
  *
- * ÒÔÏÂËùÓĞÄÚÈİ°æÈ¨¾ùÊôÖğ·É¿Æ¼¼ËùÓĞ£¬Î´¾­ÔÊĞí²»µÃÓÃÓÚÉÌÒµÓÃÍ¾£¬
- * »¶Ó­¸÷Î»Ê¹ÓÃ²¢´«²¥±¾³ÌĞò£¬ĞŞ¸ÄÄÚÈİÊ±±ØĞë±£ÁôÖğ·É¿Æ¼¼µÄ°æÈ¨ÉùÃ÷¡£
+ * ä»¥ä¸‹æ‰€æœ‰å†…å®¹ç‰ˆæƒå‡å±é€é£ç§‘æŠ€æ‰€æœ‰ï¼Œæœªç»å…è®¸ä¸å¾—ç”¨äºå•†ä¸šç”¨é€”ï¼Œ
+ * æ¬¢è¿å„ä½ä½¿ç”¨å¹¶ä¼ æ’­æœ¬ç¨‹åºï¼Œä¿®æ”¹å†…å®¹æ—¶å¿…é¡»ä¿ç•™é€é£ç§‘æŠ€çš„ç‰ˆæƒå£°æ˜ã€‚
  *
  * @file       		main
- * @company	   		³É¶¼Öğ·É¿Æ¼¼ÓĞÏŞ¹«Ë¾
- * @author     		Öğ·É¿Æ¼¼(QQ790875685)
- * @version    		²é¿´docÄÚversionÎÄ¼ş °æ±¾ËµÃ÷
+ * @company	   		æˆéƒ½é€é£ç§‘æŠ€æœ‰é™å…¬å¸
+ * @author     		é€é£ç§‘æŠ€(QQ790875685)
+ * @version    		æŸ¥çœ‹docå†…versionæ–‡ä»¶ ç‰ˆæœ¬è¯´æ˜
  * @Software 		MDK FOR C51 V9.60
  * @Target core		STC8H8K64S4
  * @Taobao   		https://seekfree.taobao.com/
@@ -20,53 +20,58 @@
 #include "headfile.h"
 
 #define KEY_PORT P2
-#define KEY_NONE 0xFF   
-volatile int mymode=0;
-volatile int mydistance=0;
-volatile int mysquarelength=0;
+#define KEY_NONE 0xFF
+volatile int mymode             = 0;
+volatile int last_mymode        = 0;
+volatile int mydistance         = 0;
+volatile int mysquarelength     = 0;
 volatile unsigned char distance = 0;
-volatile unsigned char length = 0;
+volatile unsigned char length   = 0;
+float maxpower                  = 0;
+int mynubsel                    = 0;
+int mynubselbuf                 = 0;
+int mynumbool                   = 0;
 /*
- * ÏµÍ³ÆµÂÊ£¬¿É²é¿´board.hÖĞµÄ FOSC ºê¶¨ÒåĞŞ¸Ä¡£
- * board.hÎÄ¼şÖĞFOSCµÄÖµÉèÖÃÎª0,Ôò³ÌĞò×Ô¶¯ÉèÖÃÏµÍ³ÆµÂÊÎª44.2368MHZ
- * ÔÚboard_initÖĞ,ÒÑ¾­½«P54Òı½ÅÉèÖÃÎª¸´Î»
- * Èç¹ûĞèÒªÊ¹ÓÃP54Òı½Å,¿ÉÒÔÔÚboard.cÎÄ¼şÖĞµÄboard_init()º¯ÊıÖĞÉ¾³ıSET_P54_RESRT¼´¿É
+ * ç³»ç»Ÿé¢‘ç‡ï¼Œå¯æŸ¥çœ‹board.hä¸­çš„ FOSC å®å®šä¹‰ä¿®æ”¹ã€‚
+ * board.hæ–‡ä»¶ä¸­FOSCçš„å€¼è®¾ç½®ä¸º0,åˆ™ç¨‹åºè‡ªåŠ¨è®¾ç½®ç³»ç»Ÿé¢‘ç‡ä¸º44.2368MHZ
+ * åœ¨board_initä¸­,å·²ç»å°†P54å¼•è„šè®¾ç½®ä¸ºå¤ä½
+ * å¦‚æœéœ€è¦ä½¿ç”¨P54å¼•è„š,å¯ä»¥åœ¨board.cæ–‡ä»¶ä¸­çš„board_init()å‡½æ•°ä¸­åˆ é™¤SET_P54_RESRTå³å¯
  */
 
 /*
- * LCD4002Òº¾§ÆÁÁ¬½ÓËµÃ÷£º
+ * LCD4002æ¶²æ™¶å±è¿æ¥è¯´æ˜ï¼š
  * ====================================
- * LCD4002Ä£¿é -----> STC8H8K64µ¥Æ¬»ú
+ * LCD4002æ¨¡å— -----> STC8H8K64å•ç‰‡æœº
  * ====================================
- * VCC        -----> 5V (»ò3.3V£¬¸ù¾İÄ£¿éµçÑ¹)
+ * VCC        -----> 5V (æˆ–3.3Vï¼Œæ ¹æ®æ¨¡å—ç”µå‹)
  * GND        -----> GND
- * SDA        -----> P14 (Èí¼şI2CÊı¾İÏß)
- * SCL        -----> P15 (Èí¼şI2CÊ±ÖÓÏß)
+ * SDA        -----> P14 (è½¯ä»¶I2Cæ•°æ®çº¿)
+ * SCL        -----> P15 (è½¯ä»¶I2Cæ—¶é’Ÿçº¿)
  * ====================================
- * 
- * ×¢ÒâÊÂÏî£º
- * 1. È·±£LCD4002Ä£¿éµÄI2CµØÖ·Îª0x27£¨Ä¬ÈÏµØÖ·£©
- * 2. Èç¹ûµØÖ·²»Í¬£¬ÇëĞŞ¸ÄSEEKFREE_LCD4002_I2C.hÖĞµÄLCD4002_I2C_ADDR¶¨Òå
- * 3. Èç¹ûĞèÒªĞŞ¸ÄI2CÒı½Å£¬ÇëĞŞ¸ÄSEEKFREE_SOFT_I2C.hÖĞµÄÒı½Å¶¨Òå
+ *
+ * æ³¨æ„äº‹é¡¹ï¼š
+ * 1. ç¡®ä¿LCD4002æ¨¡å—çš„I2Cåœ°å€ä¸º0x27ï¼ˆé»˜è®¤åœ°å€ï¼‰
+ * 2. å¦‚æœåœ°å€ä¸åŒï¼Œè¯·ä¿®æ”¹SEEKFREE_LCD4002_I2C.hä¸­çš„LCD4002_I2C_ADDRå®šä¹‰
+ * 3. å¦‚æœéœ€è¦ä¿®æ”¹I2Cå¼•è„šï¼Œè¯·ä¿®æ”¹SEEKFREE_SOFT_I2C.hä¸­çš„å¼•è„šå®šä¹‰
  */
 const unsigned char key_map[4][4] = {
-    {'1', '2', '3', 'A'},  
-    {'4', '5', '6', 'B'},  
-    {'7', '8', '9', 'C'},  
-    {'*', '0', '#', 'D'}   
-};
-void keydelay_ms(unsigned int ms) {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'*', '0', '#', 'D'}};
+void keydelay_ms(unsigned int ms)
+{
     unsigned int i, j;
     for (i = 0; i < ms; i++) {
-        for (j = 0; j < 10; j++);  // ????????
+        for (j = 0; j < 10; j++); // ????????
     }
 }
-unsigned char key_scan() 
+unsigned char key_scan()
 {
     static unsigned char last_key = KEY_NONE;
     unsigned char row, col, key_val;
     unsigned char read_val;
-    KEY_PORT = 0xF0;  
+    KEY_PORT = 0xF0;
     if ((KEY_PORT & 0x0F) == 0x0F) {
         last_key = KEY_NONE;
         return KEY_NONE;
@@ -77,116 +82,244 @@ unsigned char key_scan()
         return KEY_NONE;
     }
     for (row = 0; row < 4; row++) {
-			  if(row == 0)
-        KEY_PORT = ~(0x10);  
-				if(row == 1)
-        KEY_PORT = ~(0x20);  
-				if(row == 2)
-        KEY_PORT = ~(0x40);  
-				if(row == 3)
-        KEY_PORT = ~(0x80);  
+        if (row == 0)
+            KEY_PORT = ~(0x10);
+        if (row == 1)
+            KEY_PORT = ~(0x20);
+        if (row == 2)
+            KEY_PORT = ~(0x40);
+        if (row == 3)
+            KEY_PORT = ~(0x80);
         read_val = KEY_PORT & 0x0F;
         if (read_val != 0x0F) {
             switch (read_val) {
-                case 0x0E: col = 0; break;  // ?0?(P2.0)
-                case 0x0D: col = 1; break;  // ?1?(P2.1)
-                case 0x0B: col = 2; break;  // ?2?(P2.2)
-                case 0x07: col = 3; break;  // ?3?(P2.3)
-                default: return KEY_NONE;    // ????,??
+                case 0x0E:
+                    col = 0;
+                    break; // ?0?(P2.0)
+                case 0x0D:
+                    col = 1;
+                    break; // ?1?(P2.1)
+                case 0x0B:
+                    col = 2;
+                    break; // ?2?(P2.2)
+                case 0x07:
+                    col = 3;
+                    break; // ?3?(P2.3)
+                default:
+                    return KEY_NONE; // ????,??
             }
             key_val = key_map[row][col];
             while ((KEY_PORT & 0x0F) != 0x0F) {
                 keydelay_ms(1);
             }
-            if (key_val != last_key) {
-                last_key = key_val;
-                return key_val;
-            }
-            return KEY_NONE;
+            // if (key_val != last_key) {
+            last_key = key_val;
+            return key_val;
+            // }
+            // return KEY_NONE;
         }
     }
     return KEY_NONE;
 }
 void main()
 {
-		char text_buffer[20];
-		float current;
-		float vol;
-		float power;
-		float power_get;
-	  int lcdcleranum=0;
-		int mynubsel=0;
-	 
-    unsigned char key= KEY_NONE;
-	
-    board_init(); // ³õÊ¼»¯ÄÚ²¿¼Ä´æÆ÷£¬ÎğÉ¾³ı´Ë¾ä´úÂë¡£
-    // ³õÊ¼»¯LCD4002Òº¾§ÆÁ
-    lcd4002_init();
-    // ³õÊ¼»¯INA226
-    ina226_init();
-    // ÑÓÊ±Ò»ÏÂÈ·±£³õÊ¼»¯Íê³É
-    delay_ms(100);
-		lcd4002_clear();
-    while (1)
-    {
-			  
-			  unsigned int j;
-			  current = ina226_get_current();
-				//µçÁ÷½ÃÕıÏµÊı
-				current /=1.11f;
-				vol = ina226_get_bus_voltage();
-				power = current * vol;
-				power_get = ina226_get_power();
-			  // ³õÊ¼»¯LCD4002Òº¾§ÆÁ
-			  lcdcleranum++;
-			  if(lcdcleranum>20)
-        {
-					lcd4002_clear();
-					lcdcleranum=0;
-				}
-			  // ½«µçÁ÷Öµ¸ñÊ½»¯Îª×Ö·û´®
-				sprintf(text_buffer, "I:%.3fA V:%.3fV P:%.3fW", current, vol, power);
-				lcd4002_write_string_at(0, 1, text_buffer);
-			  if(mymode==0)
-			  sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm x:%dmm", mymode, mynubsel,mydistance, mysquarelength);
-				else
-				sprintf(text_buffer, "MODE:%d NUMB:%d D:?? x:??", mymode, mynubsel);
-				lcd4002_write_string_at(0, 0, text_buffer);
-			
-			
-      for (j = 0; j < 20; j++)
-			{
-				
-				delay_ms(2);
-					key = key_scan();
-					if (key != KEY_NONE) 
-					{
-							switch (key) 
-								{
-									case '0': mynubsel=0; break;
-									case '1': mynubsel=1; break;
-									case '2': mynubsel=2; break;
-									case '3': mynubsel=3; break;
-									case '4': mynubsel=4; break;
-									case '5': mynubsel=5; break;
-									case '6': mynubsel=6; break;
-									case '7': mynubsel=7; break;
-									case '8': mynubsel=8; break;
-									case '9': mynubsel=9; break;
-									case 'A': mymode=1; break;
-									case 'B': mymode=2; break;
-									case 'C': mymode=3; break;
-									case 'D': mymode=4; break;
+    char text_buffer[20];
+    float current;
+    float vol;
+    float power;
 
-								
-							}
-					}
-			}
-			//send 
-			uart_putchar(DEBUG_UART,0x00);
-			uart_putchar(DEBUG_UART,0xff);
-			uart_putchar(DEBUG_UART,mymode);
-			uart_putchar(DEBUG_UART,mynubsel);
-			uart_putchar(DEBUG_UART,0xfe);
+    float power_get;
+    int lcdcleranum = 0;
+
+    unsigned char key = KEY_NONE;
+
+    board_init(); // åˆå§‹åŒ–å†…éƒ¨å¯„å­˜å™¨ï¼Œå‹¿åˆ é™¤æ­¤å¥ä»£ç ã€‚
+    // åˆå§‹åŒ–LCD4002æ¶²æ™¶å±
+    lcd4002_init();
+    // åˆå§‹åŒ–INA226
+    ina226_init();
+    // å»¶æ—¶ä¸€ä¸‹ç¡®ä¿åˆå§‹åŒ–å®Œæˆ
+    delay_ms(100);
+    lcd4002_clear();
+    while (1) {
+
+        unsigned int j;
+        current = ina226_get_current();
+        // ç”µæµçŸ«æ­£ç³»æ•°
+        current /= 1.11f;
+        vol       = ina226_get_bus_voltage();
+        power     = current * vol;
+        power_get = ina226_get_power();
+        if (maxpower <= power) {
+            maxpower = power;
+        }
+        // åˆå§‹åŒ–LCD4002æ¶²æ™¶å±
+        lcdcleranum++;
+        if (lcdcleranum >= 50) {
+            lcd4002_clear();
+            lcdcleranum = 0;
+        }
+        // å°†ç”µæµå€¼æ ¼å¼åŒ–ä¸ºå­—ç¬¦ä¸²
+        sprintf(text_buffer, "I%.3fA V%.3fV P%.3fW MAXP%.3fW", current, vol, power, maxpower);
+        lcd4002_write_string_at(0, 1, text_buffer);
+        if (mymode == 0 && last_mymode == 2) {
+
+            sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm Lmi:%dmm", mymode, mynubsel, mydistance, mysquarelength);
+        } else if (mymode == 0 && last_mymode == 6) {
+            sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm Lma:%dmm", mymode, mynubsel, mydistance, mysquarelength);
+        }
+
+        else if (mymode == 0) {
+            sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm L:%dmm", mymode, mynubsel, mydistance, mysquarelength);
+        } else {
+            sprintf(text_buffer, "MODE: %d NUMB:%d D:?? L:??", mymode, mynubsel);
+        }
+
+        lcd4002_write_string_at(0, 0, text_buffer);
+
+        // åªæœ‰å½“mymodeä¸ä¸º0æ—¶æ‰æ›´æ–°last_mymodeï¼Œè¿™æ ·å¯ä»¥è®°ä½ä¸Šä¸€æ¬¡çš„éç©ºé—²æ¨¡å¼
+        if (mymode != 0) {
+            last_mymode = mymode;
+        }
+
+        for (j = 0; j < 20; j++) {
+
+            delay_ms(2);
+            key = key_scan();
+            if (key != KEY_NONE) {
+
+                if (mynumbool) {
+                    mynumbool = 0;
+                    switch (key) {
+                        case '0':
+                            mynubsel = 0;
+                            break;
+                        case '1':
+                            mynubsel = 1;
+                            break;
+                        case '2':
+                            mynubsel = 2;
+                            break;
+                        case '3':
+                            mynubsel = 3;
+                            break;
+                        case '4':
+                            mynubsel = 4;
+                            break;
+                        case '5':
+                            mynubsel = 5;
+                            break;
+                        case '6':
+                            mynubsel = 6;
+                            break;
+                        case '7':
+                            mynubsel = 7;
+                            break;
+                        case '8':
+                            mynubsel = 8;
+                            break;
+                        case '9':
+                            mynubsel = 9;
+                            break;
+                        case 'A':
+                            mymode      = 1;
+                            lcdcleranum = 20;
+                            break;
+                        case 'B':
+                            mymode      = 2;
+                            lcdcleranum = 20;
+                            break;
+                        case 'C':
+                            mymode      = 3;
+                            lcdcleranum = 20;
+                            break;
+                        case 'D':
+                            mymode      = 4;
+                            lcdcleranum = 20;
+                            break;
+                        case '*':
+                            mymode      = 6;
+                            lcdcleranum = 20;
+                            break;
+                        case '#':
+                            mymode      = 5;
+                            lcdcleranum = 20;
+                            break;
+                    }
+                } else {
+                    mynumbool = 1;
+                    switch (key) {
+                        case '0':
+                            mynubselbuf = 0;
+                            break;
+                        case '1':
+                            mynubselbuf = 1;
+                            break;
+                        case '2':
+                            mynubselbuf = 2;
+                            break;
+                        case '3':
+                            mynubselbuf = 3;
+                            break;
+                        case '4':
+                            mynubselbuf = 4;
+                            break;
+                        case '5':
+                            mynubselbuf = 5;
+                            break;
+                        case '6':
+                            mynubselbuf = 6;
+                            break;
+                        case '7':
+                            mynubselbuf = 7;
+                            break;
+                        case '8':
+                            mynubselbuf = 8;
+                            break;
+                        case '9':
+                            mynubselbuf = 9;
+                            break;
+                        case 'A':
+                            mymode      = 1;
+                            lcdcleranum = 20;
+                            break;
+                        case 'B':
+                            mymode      = 2;
+                            lcdcleranum = 20;
+                            break;
+                        case 'C':
+                            mymode      = 3;
+                            lcdcleranum = 20;
+                            break;
+                        case 'D':
+                            mymode      = 4;
+                            lcdcleranum = 20;
+                            break;
+                        case '*':
+                            mymode      = 6;
+                            lcdcleranum = 20;
+                            break;
+                        case '#':
+                            mymode      = 5;
+                            lcdcleranum = 20;
+                            break;
+                    }
+                }
+            }
+        }
+        // send
+        if (mymode == 5) {
+            uart_putchar(DEBUG_UART, 0x00);
+            uart_putchar(DEBUG_UART, 0xff);
+            uart_putchar(DEBUG_UART, mymode);
+            uart_putchar(DEBUG_UART, mynubselbuf);
+            uart_putchar(DEBUG_UART, 0xfe);
+        } else {
+            uart_putchar(DEBUG_UART, 0x00);
+            uart_putchar(DEBUG_UART, 0xff);
+            uart_putchar(DEBUG_UART, mymode);
+            uart_putchar(DEBUG_UART, mynubsel);
+            uart_putchar(DEBUG_UART, 0xfe);
+        }
     }
 }

@@ -44,9 +44,14 @@ void ina226_init(void)
                     INA226_CONFIG_VBUSCT_1100us |
                     INA226_CONFIG_VSHCT_1100us |
                     INA226_CONFIG_MODE_SANDBVOLT_CONTINUOUS;
-    
+    //ina226
     ina226_write_register(INA226_REG_CONFIG, config);
     ina226_write_register(INA226_REG_CALIBRATION, ina226_cal_value);
+	
+	
+	  //ina219a
+	  //ina226_write_register(0x00, 0x399F);
+    //ina226_write_register(0x05, 0x1000);
 }
 
 //=================================================================================================================

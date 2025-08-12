@@ -21,56 +21,71 @@
 
 volatile bit new_data_ready = 0;
 
+
 enum {
     STATE_WAIT_HEADER1,   // ?????1 (0x00)
     STATE_WAIT_HEADER2,   // ?????2 (0xFF)
-    STATE_READ_DISTANCE,  // ????
-    STATE_READ_LENGTH,    // ????
+    STATE_DIST_HIGH,      // ?????
+    STATE_DIST_LOW,       // ?????
+    STATE_LEN_HIGH,       // ?????
+    STATE_LEN_LOW,        // ?????
     STATE_WAIT_FOOTER     // ????? (0xFE)
 } protocol_state = STATE_WAIT_HEADER1;
-
 void ParseUART_Protocol(unsigned char rx_data) {
-    static unsigned char temp_distance, temp_length;
-    
+		static unsigned char dist_high, dist_low;
+		static unsigned char len_high, len_low;
     switch(protocol_state) {
-        case STATE_WAIT_HEADER1:
-            if(rx_data == 0x00) {
-                protocol_state = STATE_WAIT_HEADER2;
-            }
-            break;
-            
-        case STATE_WAIT_HEADER2:
-            if(rx_data == 0xFF) {
-                protocol_state = STATE_READ_DISTANCE;
-            } else {
-                protocol_state = STATE_WAIT_HEADER1; // ????,????
-            }
-            break;
-            
-        case STATE_READ_DISTANCE:
-            temp_distance = rx_data;
-            protocol_state = STATE_READ_LENGTH;
-            break;
-            
-        case STATE_READ_LENGTH:
-            temp_length = rx_data;
-            protocol_state = STATE_WAIT_FOOTER;
-            break;
-            
-        case STATE_WAIT_FOOTER:
-            if(rx_data == 0xFE) {
-                // ???????
-                mydistance = temp_distance;
-                mysquarelength = temp_length;
-						    mymode=0;
-                new_data_ready = 1;  // ????????
-            }
-            protocol_state = STATE_WAIT_HEADER1; // ???????????
-            break;
-            
-        default:
-            protocol_state = STATE_WAIT_HEADER1;
-    }
+            case STATE_WAIT_HEADER1:
+                if(rx_data == 0x00) {
+                    protocol_state = STATE_WAIT_HEADER2;
+                }
+                break;
+                
+            case STATE_WAIT_HEADER2:
+                if(rx_data == 0xFF) {
+                    protocol_state = STATE_DIST_HIGH;
+                } else {
+                    // ????,????
+                    protocol_state = STATE_WAIT_HEADER1;
+                }
+                break;
+                
+            case STATE_DIST_HIGH:
+                dist_high = rx_data;
+                protocol_state = STATE_DIST_LOW;
+                break;
+                
+            case STATE_DIST_LOW:
+                dist_low = rx_data;
+                protocol_state = STATE_LEN_HIGH;
+                break;
+                
+            case STATE_LEN_HIGH:
+                len_high = rx_data;
+                protocol_state = STATE_LEN_LOW;
+                break;
+                
+            case STATE_LEN_LOW:
+                len_low = rx_data;
+                protocol_state = STATE_WAIT_FOOTER;
+                break;
+                
+            case STATE_WAIT_FOOTER:
+                if(rx_data == 0xFE) {
+                    // ??????? - ??16??
+                  mydistance = (dist_high << 8) | dist_low;
+                  mysquarelength = (len_high << 8) | len_low;
+									mymode=0;
+                  new_data_ready = 1;  // ????????
+                }
+                // ?????????,???????
+                protocol_state = STATE_WAIT_HEADER1;
+                break;
+                
+            default:
+                protocol_state = STATE_WAIT_HEADER1;
+        }
+    
 }
 //UART1ÖÐ¶Ï
 void UART1_Isr() interrupt 4

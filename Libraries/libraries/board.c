@@ -1,16 +1,16 @@
 /*********************************************************************************************************************
  * COPYRIGHT NOTICE
- * Copyright (c) 2020,Öğ·É¿Æ¼¼
+ * Copyright (c) 2020,é€é£ç§‘æŠ€
  * All rights reserved.
- * ¼¼ÊõÌÖÂÛQQÈº£ºÒ»Èº£º179029047(ÒÑÂú)  ¶şÈº£º244861897(ÒÑÂú)  ÈıÈº£º824575535
+ * æŠ€æœ¯è®¨è®ºQQç¾¤ï¼šä¸€ç¾¤ï¼š179029047(å·²æ»¡)  äºŒç¾¤ï¼š244861897(å·²æ»¡)  ä¸‰ç¾¤ï¼š824575535
  *
- * ÒÔÏÂËùÓĞÄÚÈİ°æÈ¨¾ùÊôÖğ·É¿Æ¼¼ËùÓĞ£¬Î´¾­ÔÊĞí²»µÃÓÃÓÚÉÌÒµÓÃÍ¾£¬
- * »¶Ó­¸÷Î»Ê¹ÓÃ²¢´«²¥±¾³ÌĞò£¬ĞŞ¸ÄÄÚÈİÊ±±ØĞë±£ÁôÖğ·É¿Æ¼¼µÄ°æÈ¨ÉùÃ÷¡£
+ * ä»¥ä¸‹æ‰€æœ‰å†…å®¹ç‰ˆæƒå‡å±é€é£ç§‘æŠ€æ‰€æœ‰ï¼Œæœªç»å…è®¸ä¸å¾—ç”¨äºå•†ä¸šç”¨é€”ï¼Œ
+ * æ¬¢è¿å„ä½ä½¿ç”¨å¹¶ä¼ æ’­æœ¬ç¨‹åºï¼Œä¿®æ”¹å†…å®¹æ—¶å¿…é¡»ä¿ç•™é€é£ç§‘æŠ€çš„ç‰ˆæƒå£°æ˜ã€‚
  *
  * @file       		board
- * @company	   		³É¶¼Öğ·É¿Æ¼¼ÓĞÏŞ¹«Ë¾
- * @author     		Öğ·É¿Æ¼¼(QQ790875685)
- * @version    		²é¿´docÄÚversionÎÄ¼ş °æ±¾ËµÃ÷
+ * @company	   		æˆéƒ½é€é£ç§‘æŠ€æœ‰é™å…¬å¸
+ * @author     		é€é£ç§‘æŠ€(QQ790875685)
+ * @version    		æŸ¥çœ‹docå†…versionæ–‡ä»¶ ç‰ˆæœ¬è¯´æ˜
  * @Software 		MDK FOR C51 V9.60
  * @Target core		STC8H8K64S4
  * @Taobao   		https://seekfree.taobao.com/
@@ -24,20 +24,20 @@
 #include "zf_delay.h"
 
 
-//22.11MHzµÄIRC²ÎÊı¼Ä´æÆ÷ 0xFB
-//24MHzµÄIRC²ÎÊı¼Ä´æÆ÷ 0xFB
+//22.11MHzçš„IRCå‚æ•°å¯„å­˜å™¨ 0xFB
+//24MHzçš„IRCå‚æ•°å¯„å­˜å™¨ 0xFB
 #define IRC_22M (*((uint8  idata*)0xFA))
 #define IRC_24M (*((uint8  idata*)0xFB))
 
-//ÏµÍ³ÆµÂÊ±äÁ¿
+//ç³»ç»Ÿé¢‘ç‡å˜é‡
 uint32 sys_clk = FOSC;
 
 
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      TST8H8K»ñÈ¡ÏµÍ³ÆµÂÊ
-//  @param      NULL          	¿ÕÖµ
-//  @return     void        	ÏµÍ³ÆµÂÊ
+//  @brief      TST8H8Kè·å–ç³»ç»Ÿé¢‘ç‡
+//  @param      NULL          	ç©ºå€¼
+//  @return     void        	ç³»ç»Ÿé¢‘ç‡
 //  Sample usage:               
 //-------------------------------------------------------------------------------------------------------------------
 uint32 get_clk(void)
@@ -47,11 +47,11 @@ uint32 get_clk(void)
 	P_SW2 |= 0x80;
 	
 	if(IRCBAND)
-		temp_count = 36000000UL + ((int32)((int32)IRTRIM - (int32)IRC_22M) * 0x128E0UL); //ÆµÂÊµÄÆ«²î,¼ÆËã³ö´ó¸ÅÊı¾İ
+		temp_count = 36000000UL + ((int32)((int32)IRTRIM - (int32)IRC_22M) * 0x128E0UL); //é¢‘ç‡çš„åå·®,è®¡ç®—å‡ºå¤§æ¦‚æ•°æ®
 	else
-		temp_count = 24000000UL + ((int32)((int32)IRTRIM - (int32)IRC_24M) * 0xBB80UL);  //ÆµÂÊµÄÆ«²î,¼ÆËã³ö´ó¸ÅÊı¾İ
+		temp_count = 24000000UL + ((int32)((int32)IRTRIM - (int32)IRC_24M) * 0xBB80UL);  //é¢‘ç‡çš„åå·®,è®¡ç®—å‡ºå¤§æ¦‚æ•°æ®
 	
-		temp_count /= CLKDIV;                              	  		//ÆµÂÊÌ«µÍĞèÒª·ÖÆµ
+		temp_count /= CLKDIV;                              	  		//é¢‘ç‡å¤ªä½éœ€è¦åˆ†é¢‘
 	
 	if 	(temp_count < 5764800UL)
 		return 5529600UL;
@@ -89,9 +89,9 @@ uint32 get_clk(void)
 
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      STC8H8KÉèÖÃÏµÍ³ÆµÂÊ
-//  @param      NULL          	¿ÕÖµ
-//  @return     void        	ÏµÍ³ÆµÂÊ
+//  @brief      STC8H8Kè®¾ç½®ç³»ç»Ÿé¢‘ç‡
+//  @param      NULL          	ç©ºå€¼
+//  @return     void        	ç³»ç»Ÿé¢‘ç‡
 //  Sample usage:               
 //-------------------------------------------------------------------------------------------------------------------
 uint32 set_clk(void)
@@ -101,7 +101,7 @@ uint32 set_clk(void)
 
 	if(sys_clk == 22118400)
 	{
-		//Ñ¡Ôñ 22.1184MHz
+		//é€‰æ‹© 22.1184MHz
 		CLKDIV = 0x04;
 		IRTRIM = T22M_ADDR;
 		VRTRIM = VRT27M_ADDR;
@@ -110,7 +110,7 @@ uint32 set_clk(void)
 	}
 	else if(sys_clk == 24000000)
 	{
-		//Ñ¡Ôñ 24MHz
+		//é€‰æ‹© 24MHz
 		CLKDIV = 0x04;
 		IRTRIM = T24M_ADDR;
 		VRTRIM = VRT27M_ADDR;
@@ -119,7 +119,7 @@ uint32 set_clk(void)
 	}
 	else if(sys_clk == 27000000)
 	{
-		//Ñ¡Ôñ 27MHz
+		//é€‰æ‹© 27MHz
 		CLKDIV = 0x04;
 		IRTRIM = T27M_ADDR;
 		VRTRIM = VRT27M_ADDR;
@@ -129,7 +129,7 @@ uint32 set_clk(void)
 	else if(sys_clk == 30000000)
 	{
 	
-		//Ñ¡Ôñ 30MHz
+		//é€‰æ‹© 30MHz
 		CLKDIV = 0x04;
 		IRTRIM = T30M_ADDR;
 		VRTRIM = VRT27M_ADDR;
@@ -138,7 +138,7 @@ uint32 set_clk(void)
 	}
 	else if(sys_clk == 33177600)
 	{
-		//Ñ¡Ôñ 33.1776MHz
+		//é€‰æ‹© 33.1776MHz
 		CLKDIV = 0x04;
 		IRTRIM = T33M_ADDR;
 		VRTRIM = VRT27M_ADDR;
@@ -147,7 +147,7 @@ uint32 set_clk(void)
 	}
 	else if(sys_clk == 35000000)
 	{
-		//Ñ¡Ôñ 35MHz
+		//é€‰æ‹© 35MHz
 		CLKDIV = 0x04;
 		IRTRIM = T35M_ADDR;
 		VRTRIM = VRT44M_ADDR;
@@ -156,7 +156,7 @@ uint32 set_clk(void)
 	}
 	else if(sys_clk == 44236800)
 	{
-		//Ñ¡Ôñ 44.2368MHz
+		//é€‰æ‹© 44.2368MHz
 		CLKDIV = 0x04;
 		IRTRIM = T44M_ADDR;
 		VRTRIM = VRT44M_ADDR;
@@ -165,7 +165,7 @@ uint32 set_clk(void)
 	}
 	else if(sys_clk == 48000000)
 	{
-		//Ñ¡Ôñ 48MHz
+		//é€‰æ‹© 48MHz
 		CLKDIV = 0x04;
 		IRTRIM = T48M_ADDR;
 		VRTRIM = VRT44M_ADDR;
@@ -175,7 +175,7 @@ uint32 set_clk(void)
 	else
 	{
 		sys_clk = 44236800;
-		//Ñ¡Ôñ 44.2368MHz
+		//é€‰æ‹© 44.2368MHz
 		CLKDIV = 0x04;
 		IRTRIM = T44M_ADDR;
 		VRTRIM = VRT44M_ADDR;
@@ -196,39 +196,40 @@ void board_init(void)
 
 
 #if (1 == EXTERNAL_CRYSTA_ENABLE)
-	XOSCCR = 0xc0; 			//Æô¶¯Íâ²¿¾§Õñ
-	while (!(XOSCCR & 1)); 	//µÈ´ıÊ±ÖÓÎÈ¶¨
-	CLKDIV = 0x00; 			//Ê±ÖÓ²»·ÖÆµ
-	CKSEL = 0x01; 			//Ñ¡ÔñÍâ²¿¾§Õñ
+	XOSCCR = 0xc0; 			//å¯åŠ¨å¤–éƒ¨æ™¶æŒ¯
+	while (!(XOSCCR & 1)); 	//ç­‰å¾…æ—¶é’Ÿç¨³å®š
+	CLKDIV = 0x00; 			//æ—¶é’Ÿä¸åˆ†é¢‘
+	CKSEL = 0x01; 			//é€‰æ‹©å¤–éƒ¨æ™¶æŒ¯
 #else
 	#if (0 == FOSC)
-		// ×Ô¶¯ÉèÖÃÏµÍ³ÆµÂÊ
-		// STC8H8K°æ±¾ CHIPID31 = 0x5A
+		// è‡ªåŠ¨è®¾ç½®ç³»ç»Ÿé¢‘ç‡
+		// STC8H8Kç‰ˆæœ¬ CHIPID31 = 0x5A
 		if(CHIPID31 == 0x5A)
 		{
 			sys_clk = set_clk();
 		}
-		else	// TST8H8K°æ±¾ CHIPID31 = 0x47
+		else	// TST8H8Kç‰ˆæœ¬ CHIPID31 = 0x47
 		{
 			sys_clk = get_clk();
 		}
 	#else
-		// ÊÖ¶¯ÉèÖÃÏµÍ³ÆµÂÊ
+		// æ‰‹åŠ¨è®¾ç½®ç³»ç»Ÿé¢‘ç‡
 		sys_clk = FOSC;
 	#endif
 	
 #endif
 
-	delay_init();			//ÑÓÊ±º¯Êı³õÊ¼»¯
+	delay_init();			//å»¶æ—¶å‡½æ•°åˆå§‹åŒ–
 	
 	P0M0 = 0x00;
 	P0M1 = 0x00;
-	P1M0 = 0x00;
-	P1M1 = 0x00;
+	P1M0 = 0x00; 
+  P1M1 = 0x00; 
+
 	P2M0 = 0x00;
 	P2M1 = 0x00;
-	P3M0 = 0x00;
-	P3M1 = 0x00;
+	P3M0 = 0x00; 
+	P3M1 = 0x00; 
 	P4M0 = 0x00;
 	P4M1 = 0x00;
 	P5M0 = 0x00;
@@ -254,15 +255,15 @@ void board_init(void)
 	
 	uart_init(DEBUG_UART, DEBUG_UART_RX_PIN, DEBUG_UART_TX_PIN, DEBUG_UART_BAUD, DEBUG_UART_TIM);
 	
-	EnableGlobalIRQ();		//¿ªÆô×ÜÖĞ¶Ï
+	EnableGlobalIRQ();		//å¼€å¯æ€»ä¸­æ–­
 }
 
 
-#if (1 == PRINTF_ENABLE)      //³õÊ¼»¯µ÷ÊÔ´®¿Ú
-//ÖØ¶¨Òåprintf Êı×Ö Ö»ÄÜÊä³öuint16
+#if (1 == PRINTF_ENABLE)      //åˆå§‹åŒ–è°ƒè¯•ä¸²å£
+//é‡å®šä¹‰printf æ•°å­— åªèƒ½è¾“å‡ºuint16
 char putchar(char c)
 {
-	uart_putchar(DEBUG_UART,(uint8)c);//°Ñ×Ô¼ºÊµÏÖµÄ´®¿Ú´òÓ¡Ò»×Ö½ÚÊı¾İµÄº¯ÊıÌæ»»µ½ÕâÀï
+	uart_putchar(DEBUG_UART,(uint8)c);//æŠŠè‡ªå·±å®ç°çš„ä¸²å£æ‰“å°ä¸€å­—èŠ‚æ•°æ®çš„å‡½æ•°æ›¿æ¢åˆ°è¿™é‡Œ
 	return c;
 }
 #endif
