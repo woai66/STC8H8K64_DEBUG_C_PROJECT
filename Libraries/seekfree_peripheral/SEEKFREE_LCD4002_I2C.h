@@ -47,7 +47,7 @@
 #define LCD4002_RS          0x01    // P0
 #define LCD4002_RW          0x02    // P1  
 #define LCD4002_E           0x04    // P2
-#define LCD4002_BL          0x00    // P3 (背光默认0x08开)
+#define LCD4002_BL          0x08    // P3 (背光开启)
 #define LCD4002_D4          0x10    // P4
 #define LCD4002_D5          0x20    // P5
 #define LCD4002_D6          0x40    // P6
@@ -56,7 +56,8 @@
 // LCD命令定义
 #define LCD4002_CMD_CLEAR           0x01    // 清屏
 #define LCD4002_CMD_HOME            0x02    // 光标回到原点
-#define LCD4002_CMD_ENTRY_MODE      0x06    // 输入模式设置
+#define LCD4002_CMD_ENTRY_MODE      0x06    // 输入模式设置：光标右移，不移屏
+#define LCD4002_CMD_ENTRY_MODE_R2L  0x04    // 输入模式设置：光标左移（用于180度翻转）
 #define LCD4002_CMD_DISPLAY_ON      0x0C    // 显示开，光标关，闪烁关
 #define LCD4002_CMD_DISPLAY_OFF     0x08    // 关闭显示
 #define LCD4002_CMD_CURSOR_ON       0x0E    // 显示开，光标开，闪烁关
@@ -83,5 +84,7 @@ void lcd4002_write_float(float num, uint8 decimal_places);
 void lcd4002_write_float_at(uint8 col, uint8 row, float num, uint8 decimal_places);
 void lcd4002_create_char(uint8 location, uint8 charmap[]);
 void lcd4002_display_char(uint8 location);
+void lcd4002_set_rotation(uint8 rotate180);
+void lcd4002_write_string_at_r180(uint8 col, uint8 row, char *str);
 
 #endif 

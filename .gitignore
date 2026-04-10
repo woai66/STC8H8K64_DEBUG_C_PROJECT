@@ -17,3 +17,5 @@ SEEKFREE.code-workspace
 # eide template
 *.ept
 *.eide-template
+
+.specstory

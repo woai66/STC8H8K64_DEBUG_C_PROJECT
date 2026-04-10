@@ -24,6 +24,7 @@
 
 // 全局变量
 static uint8 lcd_backlight_state = LCD4002_BL;  // 背光状态，默认开启
+static uint8 lcd_rotation = 0;  // 0:正常显示, 1:旋转180度
 
 //-------------------------------------------------------------------------------------------------------------------
 //  @brief      LCD4002写入4位数据到PCF8574
@@ -344,4 +345,56 @@ void lcd4002_create_char(uint8 location, uint8 charmap[])
 void lcd4002_display_char(uint8 location)
 {
     lcd4002_write_char(location);
-} 
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+//  @brief      LCD4002设置显示旋转
+//  @param      rotate180       0:正常显示, 1:旋转180度
+//  @return     void
+//  @since      v1.0
+//  Sample usage:               lcd4002_set_rotation(1);
+//-------------------------------------------------------------------------------------------------------------------
+void lcd4002_set_rotation(uint8 rotate180)
+{
+    lcd_rotation = rotate180;
+    if(rotate180)
+        lcd4002_write_command(LCD4002_CMD_ENTRY_MODE_R2L);
+    else
+        lcd4002_write_command(LCD4002_CMD_ENTRY_MODE);
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+//  @brief      LCD4002在指定位置写入字符串(支持180度旋转)
+//  @param      col             列位置 (0-39)
+//  @param      row             行位置 (0-1)
+//  @param      str             要写入的字符串
+//  @return     void
+//  @since      v1.0
+//  @note       180度旋转时: row0<->row1 交换, 字符串从右端开始反向写入
+//  Sample usage:               lcd4002_write_string_at_r180(0, 0, "Hello");
+//-------------------------------------------------------------------------------------------------------------------
+void lcd4002_write_string_at_r180(uint8 col, uint8 row, char *str)
+{
+    uint8 len, i, actual_row, start_col;
+    
+    if(!lcd_rotation)
+    {
+        lcd4002_write_string_at(col, row, str);
+        return;
+    }
+    
+    len = 0;
+    while(str[len]) len++;
+    
+    if(len == 0) return;
+    
+    actual_row = (row == 0) ? 1 : 0;
+    start_col = 39 - col;
+    
+    lcd4002_set_cursor(start_col, actual_row);
+    
+    for(i = 0; i < len; i++)
+    {
+        lcd4002_write_data(str[len - 1 - i]);
+    }
+}
