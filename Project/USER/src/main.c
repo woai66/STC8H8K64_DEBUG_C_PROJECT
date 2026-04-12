@@ -2,64 +2,42 @@
 
 #define KEY_PORT P2
 #define KEY_NONE 0xFF
+
 volatile int mymode = 0;
 volatile int last_mymode = 0;
 volatile int mydistance = 0;
 volatile int mysquarelength = 0;
 volatile unsigned char distance = 0;
 volatile unsigned char length = 0;
-float maxpower = 0;
-int mynubsel = 0;
-int mynubselbuf = 0;
-int mynumbool = 0;
-/*
- * 系统频率，可查看board.h中的 FOSC 宏定义修改。
- * board.h文件中FOSC的值设置为0,则程序自动设置系统频率为44.2368MHZ
- * 在board_init中,已经将P54引脚设置为复位
- * 如果需要使用P54引脚,可以在board.c文件中的board_init()函数中删除SET_P54_RESRT即可
- */
 
-/*
- * LCD4002液晶屏连接说明：
- * ====================================
- * LCD4002模块 -----> STC8H8K64单片机
- * ====================================
- * VCC        -----> 5V (或3.3V，根据模块电压)
- * GND        -----> GND
- * SDA        -----> P14 (软件I2C数据线)
- * SCL        -----> P15 (软件I2C时钟线)
- * ====================================
- *
- * 注意事项：
- * 1. 确保LCD4002模块的I2C地址为0x27（默认地址）
- * 2. 如果地址不同，请修改SEEKFREE_LCD4002_I2C.h中的LCD4002_I2C_ADDR定义
- * 3. 如果需要修改I2C引脚，请修改SEEKFREE_SOFT_I2C.h中的引脚定义
- */
+static float maxpower = 0;
 const unsigned char key_map[4][4] = {{'1', '2', '3', 'A'},
                                      {'4', '5', '6', 'B'},
                                      {'7', '8', '9', 'C'},
                                      {'*', '0', '#', 'D'}};
-void keydelay_ms(unsigned int ms) {
+
+static void keydelay_ms(unsigned int ms) {
   unsigned int i, j;
   for (i = 0; i < ms; i++) {
     for (j = 0; j < 10; j++)
       ;
   }
 }
-unsigned char key_scan() {
-  static unsigned char last_key = KEY_NONE;
+
+static unsigned char key_scan(void) {
   unsigned char row, col, key_val;
   unsigned char read_val;
+
   KEY_PORT = 0xF0;
   if ((KEY_PORT & 0x0F) == 0x0F) {
-    last_key = KEY_NONE;
     return KEY_NONE;
   }
+
   keydelay_ms(5);
   if ((KEY_PORT & 0x0F) == 0x0F) {
-    last_key = KEY_NONE;
     return KEY_NONE;
   }
+
   for (row = 0; row < 4; row++) {
     if (row == 0)
       KEY_PORT = ~(0x10);
@@ -69,241 +47,148 @@ unsigned char key_scan() {
       KEY_PORT = ~(0x40);
     if (row == 3)
       KEY_PORT = ~(0x80);
+
     read_val = KEY_PORT & 0x0F;
     if (read_val != 0x0F) {
       switch (read_val) {
       case 0x0E:
         col = 0;
-        break; // ?0?(P2.0)
+        break;
       case 0x0D:
         col = 1;
-        break; // ?1?(P2.1)
+        break;
       case 0x0B:
         col = 2;
-        break; // ?2?(P2.2)
+        break;
       case 0x07:
         col = 3;
-        break; // ?3?(P2.3)
+        break;
       default:
-        return KEY_NONE; // ????,??
+        return KEY_NONE;
       }
+
       key_val = key_map[row][col];
       while ((KEY_PORT & 0x0F) != 0x0F) {
         keydelay_ms(1);
       }
-      // if (key_val != last_key) {
-      last_key = key_val;
       return key_val;
-      // }
-      // return KEY_NONE;
     }
   }
+
   return KEY_NONE;
 }
+
+static void apply_key(unsigned char key, int *lcd_clear_num) {
+  switch (key) {
+  case '1':
+    mymode = 1;
+    *lcd_clear_num = 20;
+    break;
+  case '2':
+    mymode = 2;
+    *lcd_clear_num = 20;
+    break;
+  case '3':
+    mymode = 3;
+    *lcd_clear_num = 20;
+    break;
+  case '4':
+    mymode = 4;
+    *lcd_clear_num = 20;
+    break;
+  case '0':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9':
+  case 'A':
+  case 'B':
+  case 'C':
+  case 'D':
+  case '*':
+  case '#':
+  default:
+    break;
+  }
+}
+
+static void write_mode_line(char *text_buffer) {
+  if (mymode != 0) {
+    sprintf(text_buffer, "MODE:%d D:?? L:??", mymode);
+  } else if (last_mymode == 1) {
+    sprintf(text_buffer, "BASIC D:%d L:%d", mydistance, mysquarelength);
+  } else if (last_mymode == 2) {
+    sprintf(text_buffer, "MIN   D:%d L:%d", mydistance, mysquarelength);
+  } else if (last_mymode == 3) {
+    sprintf(text_buffer, "MAX   D:%d L:%d", mydistance, mysquarelength);
+  } else if (last_mymode == 4) {
+    sprintf(text_buffer, "TILT  D:%d L:%d", mydistance, mysquarelength);
+  } else {
+    sprintf(text_buffer, "IDLE  D:%d L:%d", mydistance, mysquarelength);
+  }
+}
+
+static void send_mode_command(void) {
+  uart_putchar(DEBUG_UART, 0x00);
+  uart_putchar(DEBUG_UART, 0xff);
+  uart_putchar(DEBUG_UART, mymode);
+  uart_putchar(DEBUG_UART, 0x00);
+  uart_putchar(DEBUG_UART, 0xfe);
+}
+
 void main() {
   char text_buffer[20];
   float current;
   float vol;
   float power;
-
-  float power_get;
-  int lcdcleranum = 0;
-
+  int lcd_clear_num = 0;
   unsigned char key = KEY_NONE;
+  unsigned int j;
 
-  board_init(); // 初始化内部寄存器，勿删除此句代码。
-  // 初始化LCD4002液晶屏
+  board_init();
   lcd4002_init();
-  // 初始化INA226
   ina226_init();
-  // 延时一下确保初始化完成
   delay_ms(100);
   lcd4002_backlight(1);
   lcd4002_set_rotation(0);
   lcd4002_clear();
-  while (1) {
 
-    unsigned int j;
+  while (1) {
     current = ina226_get_current();
-    // 电流矫正系数
     current /= 1.11f;
     vol = ina226_get_bus_voltage();
     power = current * vol;
-    power_get = ina226_get_power();
+
     if (maxpower <= power) {
       maxpower = power;
     }
-    // 初始化LCD4002液晶屏
-    lcdcleranum++;
-    if (lcdcleranum >= 50) {
+
+    lcd_clear_num++;
+    if (lcd_clear_num >= 50) {
       lcd4002_clear();
-      lcdcleranum = 0;
+      lcd_clear_num = 0;
     }
-    // 将电流值格式化为字符串
-    sprintf(text_buffer, "I%.3fA V%.3fV P%.3fW MAXP%.3fW", current, vol, power,
+
+    sprintf(text_buffer, "I%.3fA V%.3fV P%.3fW MAX%.3f", current, vol, power,
             maxpower);
     lcd4002_write_string_at_r180(0, 1, text_buffer);
-    if (mymode == 0 && last_mymode == 2) {
 
-      sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm Lmi:%dmm", mymode, mynubsel,
-              mydistance, mysquarelength);
-    } else if (mymode == 0 && last_mymode == 6) {
-      sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm Lma:%dmm", mymode, mynubsel,
-              mydistance, mysquarelength);
-    }
-
-    else if (mymode == 0) {
-      sprintf(text_buffer, "MODE:%d NUMB:%d D:%dmm L:%dmm", mymode, mynubsel,
-              mydistance, mysquarelength);
-    } else {
-      sprintf(text_buffer, "MODE: %d NUMB:%d D:?? L:??", mymode, mynubsel);
-    }
-
-    lcd4002_write_string_at_r180(0, 0, text_buffer);
-
-    // 只有当mymode不为0时才更新last_mymode，这样可以记住上一次的非空闲模式
     if (mymode != 0) {
       last_mymode = mymode;
     }
 
-    for (j = 0; j < 20; j++) {
+    write_mode_line(text_buffer);
+    lcd4002_write_string_at_r180(0, 0, text_buffer);
 
+    for (j = 0; j < 20; j++) {
       delay_ms(2);
       key = key_scan();
       if (key != KEY_NONE) {
-
-        if (mynumbool) {
-          mynumbool = 0;
-          switch (key) {
-          case '0':
-            mynubsel = 0;
-            break;
-          case '1':
-            mynubsel = 1;
-            break;
-          case '2':
-            mynubsel = 2;
-            break;
-          case '3':
-            mynubsel = 3;
-            break;
-          case '4':
-            mynubsel = 4;
-            break;
-          case '5':
-            mynubsel = 5;
-            break;
-          case '6':
-            mynubsel = 6;
-            break;
-          case '7':
-            mynubsel = 7;
-            break;
-          case '8':
-            mynubsel = 8;
-            break;
-          case '9':
-            mynubsel = 9;
-            break;
-          case 'A':
-            mymode = 1;
-            lcdcleranum = 20;
-            break;
-          case 'B':
-            mymode = 2;
-            lcdcleranum = 20;
-            break;
-          case 'C':
-            mymode = 3;
-            lcdcleranum = 20;
-            break;
-          case 'D':
-            mymode = 4;
-            lcdcleranum = 20;
-            break;
-          case '*':
-            mymode = 6;
-            lcdcleranum = 20;
-            break;
-          case '#':
-            mymode = 5;
-            lcdcleranum = 20;
-            break;
-          }
-        } else {
-          mynumbool = 1;
-          switch (key) {
-          case '0':
-            mynubselbuf = 0;
-            break;
-          case '1':
-            mynubselbuf = 1;
-            break;
-          case '2':
-            mynubselbuf = 2;
-            break;
-          case '3':
-            mynubselbuf = 3;
-            break;
-          case '4':
-            mynubselbuf = 4;
-            break;
-          case '5':
-            mynubselbuf = 5;
-            break;
-          case '6':
-            mynubselbuf = 6;
-            break;
-          case '7':
-            mynubselbuf = 7;
-            break;
-          case '8':
-            mynubselbuf = 8;
-            break;
-          case '9':
-            mynubselbuf = 9;
-            break;
-          case 'A':
-            mymode = 1;
-            lcdcleranum = 20;
-            break;
-          case 'B':
-            mymode = 2;
-            lcdcleranum = 20;
-            break;
-          case 'C':
-            mymode = 3;
-            lcdcleranum = 20;
-            break;
-          case 'D':
-            mymode = 4;
-            lcdcleranum = 20;
-            break;
-          case '*':
-            mymode = 6;
-            lcdcleranum = 20;
-            break;
-          case '#':
-            mymode = 5;
-            lcdcleranum = 20;
-            break;
-          }
-        }
+        apply_key(key, &lcd_clear_num);
       }
     }
-    // send
-    if (mymode == 5) {
-      uart_putchar(DEBUG_UART, 0x00);
-      uart_putchar(DEBUG_UART, 0xff);
-      uart_putchar(DEBUG_UART, mymode);
-      uart_putchar(DEBUG_UART, mynubselbuf);
-      uart_putchar(DEBUG_UART, 0xfe);
-    } else {
-      uart_putchar(DEBUG_UART, 0x00);
-      uart_putchar(DEBUG_UART, 0xff);
-      uart_putchar(DEBUG_UART, mymode);
-      uart_putchar(DEBUG_UART, mynubsel);
-      uart_putchar(DEBUG_UART, 0xfe);
-    }
+
+    send_mode_command();
   }
 }

@@ -1,0 +1,8 @@
+id: asda
+name: 毕业设计
+version: 1.0.1
+author: zyq
+icon: ''
+desc: zyq
+files:
+  - main.py
